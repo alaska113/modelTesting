@@ -3,14 +3,14 @@ import importlib
 import torch
 import torch.utils.data
 import numpy as np
+
 def loadModel():
     # model
     module = importlib.import_module('models.{}'.format("lenet"))
     model = module.Model()
     return model
 
-def myTest():
-    model = loadModel()
+def prepareSampleImage():
     images = [[[0.36966825, 0.37914693, 0.3507109 , 0.3649289 , 0.3744076 ,
                         0.3744076 , 0.3744076 , 0.3649289 , 0.36966825, 0.37914693,
                         0.3886256 , 0.3886256 , 0.39336494, 0.39336494, 0.39336494,
@@ -443,26 +443,32 @@ def myTest():
                                0.38388625, 0.3744076 , 0.3649289 , 0.3744076 , 0.3886256 ,
                                0.39336494, 0.4265403 , 0.4170616 , 0.4028436 , 0.49289098,
                                0.6161137 , 0.7109005 , 0.81042653, 0.8341232 , 0.91943127]]]
-    
-    print("Images is size " + str(len(images)) + " x " + str(len(images[0])) + " x " + str(len(images[0][0])))
+
     images = np.array(images)
-    poses = np.array([-0.004605413803330658,1.7516345710193977])
     images = torch.unsqueeze(torch.from_numpy(images), 1)
-    poses = torch.unsqueeze(torch.from_numpy(poses),1)
     images = images.float()
+    return images
+
+
+def prepareHeadpose():
+    poses = np.array([-0.004605413803330658,1.7516345710193977])
+    poses = torch.unsqueeze(torch.from_numpy(poses),1)
     poses = poses.float()
-    
-    print("Cuda length: ", len(images))
+    return poses
+
+def runTest():
+    model = loadModel()
+    images, poses = prepareSampleImage(), prepareHeadpose()
     images, poses = images.cuda(), poses.cuda()
     model.cuda()
-
-    print("poses: ", poses.cuda())
+    
     with torch.no_grad():
         outputs = model(images, poses)
+
     print("OUTPUTS!: ", outputs)
 
 if __name__ == "__main__":
-    myTest()
+    runTest()
 
 
 
