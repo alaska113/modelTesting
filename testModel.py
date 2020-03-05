@@ -4,13 +4,54 @@ import torch
 import torch.utils.data
 import numpy as np
 
+
+
+def run():
+    model = loadModel()
+    model.cuda()
+    test_loader = get_loader(imagesArr(), posesArr(), 1, 1, True)
+    test(model, test_loader)
+
+
+class MPIIGazeDataset(torch.utils.data.Dataset):
+    def __init__(self, images, poses):
+        self.images = images
+        self.poses = poses
+        self.length = len(self.images)
+        self.images = torch.unsqueeze(torch.from_numpy(self.images), 1)
+        self.poses = torch.from_numpy(self.poses)
+
+    def __getitem__(self, index):
+        return self.images[index], self.poses[index]
+
+    def __len__(self):
+        return self.length
+
+    def __repr__(self):
+        return self.__class__.__name__
+
+def get_loader(images, poses, batch_size, num_workers, use_gpu):  
+    test_dataset = MPIIGazeDataset(images, poses)
+
+    test_loader = torch.utils.data.DataLoader(
+        test_dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        shuffle=False,
+        pin_memory=use_gpu,
+        drop_last=False,
+    )
+    return test_loader
+
+
+
 def loadModel():
     # model
     module = importlib.import_module('models.{}'.format("lenet"))
     model = module.Model()
     return model
 
-def prepareSampleImage():
+def imagesArr():
     images = [[[0.36966825, 0.37914693, 0.3507109 , 0.3649289 , 0.3744076 ,
                         0.3744076 , 0.3744076 , 0.3649289 , 0.36966825, 0.37914693,
                         0.3886256 , 0.3886256 , 0.39336494, 0.39336494, 0.39336494,
@@ -443,32 +484,32 @@ def prepareSampleImage():
                                0.38388625, 0.3744076 , 0.3649289 , 0.3744076 , 0.3886256 ,
                                0.39336494, 0.4265403 , 0.4170616 , 0.4028436 , 0.49289098,
                                0.6161137 , 0.7109005 , 0.81042653, 0.8341232 , 0.91943127]]]
-
     images = np.array(images)
-    images = torch.unsqueeze(torch.from_numpy(images), 1)
-    images = images.float()
     return images
 
 
-def prepareHeadpose():
-    poses = np.array([-0.004605413803330658,1.7516345710193977])
-    poses = torch.unsqueeze(torch.from_numpy(poses),1)
-    poses = poses.float()
+def test(model, test_loader):
+    model.eval()
+    
+    for step, (images, poses) in enumerate(test_loader):
+        images = images.float()
+        poses = poses.float()
+        images = images.cuda()
+        poses = poses.cuda()
+
+        with torch.no_grad():
+            outputs = model(images, poses)
+
+        print(outputs)
+
+def posesArr():
+    poses = np.array([[-0.004605413803330658,1.7516345710193977]])
     return poses
 
-def runTest():
-    model = loadModel()
-    images, poses = prepareSampleImage(), prepareHeadpose()
-    images, poses = images.cuda(), poses.cuda()
-    model.cuda()
-    
-    with torch.no_grad():
-        outputs = model(images, poses)
 
-    print("OUTPUTS!: ", outputs)
 
 if __name__ == "__main__":
-    runTest()
+    run()
 
 
 
