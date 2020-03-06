@@ -26,20 +26,21 @@ class PreProcessImages:
     
     def processImages(self):
         for image in self.images:
-            pose, eyes = self.extractFeaturesFromImage(image)
+            pose, leftEye, rightEye = self.extractFeaturesFromImage(image)
             self.poses.append(pose)
             self.poses.append(pose) #Have to do twice, for both eyes.
-            self.eyes.append(eyes)
+            self.eyes.append(leftEye)
+            self.eyes.append(rightEye)
         self.eyes = np.array(self.eyes)
         self.poses = np.array(self.poses)
 
     def extractFeaturesFromImage(self, image):
         shapes, grayImage = self.getFacialLandmarks(image)
         landmarks = shapes[0] #TODO this assumes there is only one face in image!!
-        eyes = self.extractEyesFromGrayscale(grayImage, landmarks)
+        leftEye, rightEye = self.extractEyesFromGrayscale(grayImage, landmarks)
         #TODO Need to change hardcoded resolution for YPR
         yaw, pitch, roll = self.getHeadPosition(shapes[0], (426,640))
-        return (yaw,pitch,roll), eyes
+        return [yaw,pitch,roll], leftEye, rightEye
 
     def convertImageToGrayscale(self, image):
         return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -59,7 +60,7 @@ class PreProcessImages:
     def extractEyesFromGrayscale(self, grayImage, landmarks):
         leftEye = self.getLeftEye(grayImage, landmarks)
         rightEye = self.getRightEye(grayImage, landmarks)
-        return [leftEye, rightEye]
+        return leftEye, rightEye
         
     def getRightEye(self, grayImage, landmarks):
         desiredSize = [60, 36]
