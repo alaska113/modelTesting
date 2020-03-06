@@ -6,7 +6,7 @@ from preProcessing.main import *
 import sys
 
 def run():
-    imagePath = sys.arv[1]
+    imagePath = sys.argv[1]
     data = PreProcessImages(imagePath)
     model = loadModel()
     model.cuda()
