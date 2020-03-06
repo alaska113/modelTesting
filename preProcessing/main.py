@@ -10,26 +10,20 @@ import glob
 from statistics import mean
 import sys
 
-
-
-
 class PreProcessImages:
     def __init__(self, imagesDir):
         self.imagesDir = imagesDir
-        self.images = loadImages()
+        self.images = self.loadImages()
         self.eyes = []
         self.poses = []
         self.processImages()
         
     def loadImages(self):
-        images = []
-        filenames = [img for img in glob.glob(self.imagesDir)]
+        filenames = glob.glob(self.imagesDir)
         filenames.sort()
-        for img in filenames:
-            image = cv2.imread(img)
-            images.append(image)
+        images = [cv2.imread(img) for img in filenames]
         return images
-
+    
     def processImages(self):
         for image in self.images:
             pose, eyes = self.extractFeaturesFromImage(image)
@@ -38,19 +32,19 @@ class PreProcessImages:
 
     def extractFeaturesFromImage(self, image):
         shapes, grayImage = self.getFacialLandmarks(image)
+        landmarks = shapes[0] #TODO this assumes there is only one face in image!!
         eyes = self.extractEyesFromGrayscale(grayImage, landmarks)
         #TODO Need to change hardcoded resolution for YPR
         yaw, pitch, roll = self.getHeadPosition(shapes[0], (426,640))
         return (yaw,pitch,roll), eyes
 
     def convertImageToGrayscale(self, image):
-        return cv2.cvtColor(image,
-                            cv2.COLOR_BGR2GRAY)
+        return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     def getFacialLandmarks(self, image):
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-        grayImage = convertImageToGrayscale(image)
+        grayImage = self.convertImageToGrayscale(image)
         rects = detector(grayImage)
         shapes = []
         for rect in rects:
@@ -75,7 +69,7 @@ class PreProcessImages:
         croppedEyeGray = np.resize(np.array(croppedEyeGray), (36,60))
         return croppedEyeGray
 
-    def getLeftEye(grayImage, landmarks):
+    def getLeftEye(self, grayImage, landmarks):
         desiredSize = [60, 36]
         middlePoint = (mean([landmarks[42][0], landmarks[45][0]]), mean([landmarks[42][1], landmarks[45][1]]))
         upLeft = (int(middlePoint[0] - desiredSize[0]/2), int(middlePoint[1] + desiredSize[1]/2))
@@ -87,7 +81,7 @@ class PreProcessImages:
         return croppedEyeGray
         
         
-    def getHeadPosition(landmarksArr, resolution):
+    def getHeadPosition(self, landmarksArr, resolution):
         landmarks = np.array(
             [
                 (landmarksArr[45][0], landmarksArr[45][1]),
@@ -163,7 +157,7 @@ class PreProcessImages:
         return yaw, pitch, roll
 
 
-    def rotate_landmark(origin, point, angle):
+    def rotate_landmark(self, origin, point, angle):
         """
         Rotate a point counterclockwise by a given angle around a given origin.
 
@@ -176,9 +170,9 @@ class PreProcessImages:
         qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
         return qx, qy
 
-    def normalize(grayscale):
+    def normalize(self, grayscale):
         return (grayscale - min(grayscale))/(max(grayscale)-min(grayscale))
 
 
 if __name__ == "__main__":
-    PreProcessImages(sys.args[0])
+    PreProcessImages(sys.argv[1])
