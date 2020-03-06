@@ -10,7 +10,7 @@ def run():
     data = PreProcessImages(imagePath)
     model = loadModel()
     model.cuda()
-    test_loader = get_loader(data.eyes, data.poses, 1, 1, True)
+    test_loader = get_loader(data.eyes, data.poses, len(data.eyes), 1, True)
     test(model, test_loader)
 
 
