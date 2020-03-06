@@ -28,8 +28,10 @@ class PreProcessImages:
         for image in self.images:
             pose, eyes = self.extractFeaturesFromImage(image)
             self.poses.append(pose)
-            self.poses.appedn(pose) #Have to do twice, for both eyes.
+            self.poses.append(pose) #Have to do twice, for both eyes.
             self.eyes.append(eyes)
+        self.eyes = np.array(self.eyes)
+        self.poses = np.array(self.poses)
 
     def extractFeaturesFromImage(self, image):
         shapes, grayImage = self.getFacialLandmarks(image)
