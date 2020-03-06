@@ -28,6 +28,7 @@ class PreProcessImages:
         for image in self.images:
             pose, eyes = self.extractFeaturesFromImage(image)
             self.poses.append(pose)
+            self.poses.appedn(pose) #Have to do twice, for both eyes.
             self.eyes.append(eyes)
 
     def extractFeaturesFromImage(self, image):
