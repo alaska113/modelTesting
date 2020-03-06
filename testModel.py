@@ -1,15 +1,16 @@
-
 import importlib
 import torch
 import torch.utils.data
 import numpy as np
-
-
+from preProcessing.main import *
+import sys
 
 def run():
+    imagePath = sys.arv[1]
+    data = PreProcessImages(imagePath)
     model = loadModel()
     model.cuda()
-    test_loader = get_loader(imagesArr(), posesArr(), 1, 1, True)
+    test_loader = get_loader(data.eyes, data.poses, 1, 1, True)
     test(model, test_loader)
 
 
