@@ -9,9 +9,13 @@ def runOnCompressedData(dataFilePath):
     model = loadModel()
     model.cuda()
     test_loader = get_loader(loaded["eyes"], loaded["poses"], len(loaded["eyes"]), 1, True)
-    test(model, test_loader)
+    outputs = test(model, test_loader)
+    saveOutputs(outputs)
     
 
+def saveOutputs(outputs):
+    np.savez_compressed("./outputs", gazeLocation=outputs) 
+    
 def run():
     imagePath = sys.argv[1]
     data = PreProcessImages(imagePath)
@@ -63,6 +67,7 @@ def test(model, test_loader):
     model.eval()
     
     for step, (images, poses) in enumerate(test_loader):
+        print("Step: ", step)
         images = images.float()
         poses = poses.float()
         images = images.cuda()
@@ -71,8 +76,7 @@ def test(model, test_loader):
         with torch.no_grad():
             outputs = model(images, poses)
 
-        print(outputs)
-
+    return outputs.cpu()
 def posesArr():
     poses = np.array([[-0.004605413803330658,1.7516345710193977]])
     return poses
