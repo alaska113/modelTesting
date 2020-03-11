@@ -6,8 +6,16 @@ import sys
 from MPIIGazeDataset import MPIIGazeDataset
 
 class GazePredictor:
-    def __init__(self, dataFilePath):
-        self.dataFilePath = dataFilePath
+    def __init__(self, eyes, poses):
+        self.eyes = eyes
+        self.poses = poses
+        self.run()
+
+    def run(self):
+        self.model = self.loadModel()
+        self.model.cuda()
+        test_loader = self.get_loader(self.eyes, self.poses, len(self.eyes), 1, True)
+        self.outputs = self.test(test_loader)
 
     def runOnCompressedData(self):
         self.data = np.load(self.dataFilePath)

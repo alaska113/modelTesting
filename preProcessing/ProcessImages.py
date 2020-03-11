@@ -10,7 +10,7 @@ import glob
 from statistics import mean
 import sys
 
-class PreProcessImages:
+class ProcessImages:
     def __init__(self, imagesDir):
         self.imagesDir = imagesDir
         self.images = self.loadImages()
@@ -30,11 +30,10 @@ class PreProcessImages:
 
     def loadData(self):
         loaded = np.load("./demoData.npz")
-        print(loaded["poses"])
+
     def processImages(self):
         counter = 0
         for image in self.images:
-            print("Processing image: ", counter)
             counter+=1
             faceFound, shapes, grayImage = self.faceDetection(image)
             if faceFound:
