@@ -62,7 +62,7 @@ class PreProcessImages:
         leftEye, rightEye = self.extractEyesFromGrayscale(grayImage, landmarks)
         #TODO Need to change hardcoded resolution for YPR
         yaw, pitch, roll = self.getHeadPosition(shapes[0], (426,640))
-        return [pitch, yaw], leftEye, rightEye
+        return [yaw, roll], leftEye, rightEye
 
     def convertImageToGrayscale(self, image):
         return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
