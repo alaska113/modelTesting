@@ -3,7 +3,7 @@ import torch
 import torch.utils.data
 import numpy as np
 import sys
-from MPIIGazeDataset import MPIIGazeDataset
+from ModelModules.MPIIGazeDataset import MPIIGazeDataset
 
 class GazePredictor:
     def __init__(self, eyes, poses):
