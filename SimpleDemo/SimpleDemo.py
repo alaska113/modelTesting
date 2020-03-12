@@ -44,7 +44,7 @@ class SimpleDemo:
         return images
 
     def loadData(self):
-        loaded = np.load(self.demoDataPath+"ouputs.npz")
+        loaded = np.load(self.demoDataPath+"outputs.npz")
         return loaded
 
 
