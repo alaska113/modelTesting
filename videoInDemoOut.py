@@ -8,10 +8,19 @@ import sys
 class VideoInDemoOut:
     def __init__(self, videoPath):
         self.videoPath = videoPath
-        self.frameGrabber = FrameGrabber(self.videoPath)
+        self.makeDemoDir()
+        self.frameGrabber = FrameGrabber(self.videoPath, "./demo")
         self.imageProcessor = ProcessImages("./videoData/*.jpg")
         self.gazePredictor = GazePredictor(self.imageProcessor.eyes, self.imageProcessor.poses)
-        self.simpleDemo = SimpleDemo("./")
+        self.simpleDemo = SimpleDemo("./demo/")
+
+    def makeDemoDir(self):
+        try:
+            if not os.path.exists("./demo"):
+                os.makedirs("./demo")
+
+        except OSError:
+            print("Error creating directory for frames from video!")
 
 if __name__ == "__main__":
     VideoInDemoOut(sys.argv[1])

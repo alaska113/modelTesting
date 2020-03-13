@@ -11,8 +11,9 @@ from statistics import mean
 import sys
 
 class ProcessImages:
-    def __init__(self, imagesDir):
+    def __init__(self, imagesDir, savePath):
         self.imagesDir = imagesDir
+        self.savePath = savePath
         self.images = self.loadImages()
         self.eyes = []
         self.poses = []
@@ -26,7 +27,7 @@ class ProcessImages:
         return images
 
     def saveData(self):
-        np.savez_compressed("./demoData", eyes=self.eyes, poses=self.poses)
+        np.savez_compressed(self.savePath + "/demoData", eyes=self.eyes, poses=self.poses)
 
     def loadData(self):
         loaded = np.load("./demoData.npz")
