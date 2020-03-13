@@ -4,13 +4,14 @@ from ModelModules.GazePredictor import GazePredictor
 # from ModelModules.MPIIGazeDataset import MPIIGazeDataset
 from SimpleDemo.SimpleDemo import SimpleDemo
 import sys
+import os
 
 class VideoInDemoOut:
     def __init__(self, videoPath):
         self.videoPath = videoPath
         self.makeDemoDir()
         self.frameGrabber = FrameGrabber(self.videoPath, "./demo")
-        self.imageProcessor = ProcessImages("./videoData/*.jpg")
+        self.imageProcessor = ProcessImages("./demo/frames/*.jpg", "./demo")
         self.gazePredictor = GazePredictor(self.imageProcessor.eyes, self.imageProcessor.poses)
         self.simpleDemo = SimpleDemo("./demo/")
 
