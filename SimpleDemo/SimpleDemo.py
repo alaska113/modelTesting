@@ -61,6 +61,7 @@ class SimpleDemo:
     def loadImages(self):
         images = []
         filenames = glob.glob(self.imagesDir + "*.jpg")
+        print("Checking what we're grabbing: ", filenames[0][13:-4])
         filenames = sorted(filenames, key=lambda s: int(s[13:-4]))
         # filenames.sort()
         print(filenames)
@@ -78,4 +79,4 @@ class SimpleDemo:
 
 
 if __name__ == "__main__":
-    SimpleDemo("./")
+    SimpleDemo("./demo/")
