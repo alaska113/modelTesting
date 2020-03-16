@@ -61,8 +61,8 @@ class SimpleDemo:
     def loadImages(self):
         images = []
         filenames = glob.glob(self.imagesDir + "*.jpg")
-        print("Checking what we're grabbing: ", filenames[0][13:-4])
-        filenames = sorted(filenames, key=lambda s: int(s[13:-4]))
+        print("Checking what we're grabbing: ", filenames[0][14:-4])
+        filenames = sorted(filenames, key=lambda s: int(s[14:-4]))
         # filenames.sort()
         print(filenames)
         for img in filenames:
