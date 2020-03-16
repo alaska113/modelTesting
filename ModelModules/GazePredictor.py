@@ -29,7 +29,7 @@ class GazePredictor:
         self.outputs = self.test(test_loader)
 
     def saveOutputs(self, outputs, images, poses):
-        np.savez_compressed("./outputs", gazes=outputs, eyes=images, poses=poses)
+        np.savez_compressed("../demo/outputs", gazes=outputs, eyes=images, poses=poses)
 
     def loadModel(self):
         module = importlib.import_module('models.{}'.format("lenet"))
