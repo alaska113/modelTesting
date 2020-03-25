@@ -10,9 +10,10 @@ import glob
 from statistics import mean
 import sys
 
-class PreProcessImages:
-    def __init__(self, imagesDir):
+class ProcessImages:
+    def __init__(self, imagesDir, savePath):
         self.imagesDir = imagesDir
+        self.savePath = savePath
         self.images = self.loadImages()
         self.eyes = []
         self.poses = []
@@ -26,15 +27,14 @@ class PreProcessImages:
         return images
 
     def saveData(self):
-        np.savez_compressed("./demoData", eyes=self.eyes, poses=self.poses)
+        np.savez_compressed(self.savePath + "/demoData", eyes=self.eyes, poses=self.poses)
 
     def loadData(self):
         loaded = np.load("./demoData.npz")
-        print(loaded["poses"])
+
     def processImages(self):
         counter = 0
         for image in self.images:
-            print("Processing image: ", counter)
             counter+=1
             faceFound, shapes, grayImage = self.faceDetection(image)
             if faceFound:
@@ -69,7 +69,7 @@ class PreProcessImages:
 
     def getFacialLandmarks(self, image):
         detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+        predictor = dlib.shape_predictor("./preProcessing/shape_predictor_68_face_landmarks.dat")
         grayImage = self.convertImageToGrayscale(image)
         rects = detector(grayImage)
         shapes = []
