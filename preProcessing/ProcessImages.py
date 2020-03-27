@@ -64,6 +64,7 @@ class ProcessImages:
         yaw, pitch, roll = self.getHeadPosition(shapes[0], (426,640))
         return [yaw, roll], leftEye, rightEye
 
+
     def convertImageToGrayscale(self, image):
         return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 

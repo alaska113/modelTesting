@@ -6,30 +6,37 @@ import sys
 from ModelModules.MPIIGazeDataset import MPIIGazeDataset
 
 class GazePredictor:
-    def __init__(self, eyes, poses):
-        self.eyes = eyes
-        self.poses = poses
-        self.run()
+    def __init__(self):
+        self.dummy = None
 
     def run(self):
         self.model = self.loadModel()
-        self.model.cuda()
+        # self.model.cuda()
         test_loader = self.get_loader(self.eyes, self.poses, len(self.eyes), 1, True)
         self.outputs = self.test(test_loader)
 
-    def runOnCompressedData(self):
+    def runOnCompressedData(self, path):
+        self.dataFilePath = path
         self.data = np.load(self.dataFilePath)
-        self.model = self.loadModel()
-        self.model.cuda()
+        self.model = self.loadSavedModel()
         test_loader = self.get_loader(
                         self.data["eyes"],
                         self.data["poses"],
                         len(self.data["eyes"]), 1, True)
 
         self.outputs = self.test(test_loader)
+        print(self.outputs)
 
     def saveOutputs(self, outputs, images, poses):
         np.savez_compressed("./demo/outputs", gazes=outputs, eyes=images, poses=poses)
+
+    def loadSavedModel(self):
+        module = importlib.import_module('models.{}'.format("lenet"))
+        model = module.Model()
+        # model.load_state_dict(torch.load("./results/00/config.json", map_location=torch.device('cpu')))
+        modelLoaded = torch.load("./results/00/model_state.pth", map_location=torch.device('cpu'))["state_dict"]
+        model.load_state_dict(modelLoaded)
+        return model
 
     def loadModel(self):
         module = importlib.import_module('models.{}'.format("lenet"))
@@ -42,14 +49,12 @@ class GazePredictor:
         for step, (images, poses) in enumerate(test_loader):
             images = images.float()
             poses = poses.float()
-            images = images.cuda()
-            poses = poses.cuda()
 
             with torch.no_grad():
                 outputs = self.model(images, poses)
 
-        self.saveOutputs(outputs.cpu(), images.cpu(), poses.cpu())
-        return outputs.cpu()
+        self.saveOutputs(outputs, images, poses)
+        return outputs
 
 
     def get_loader(self, images, poses, batch_size, num_workers, use_gpu):
@@ -70,4 +75,4 @@ class GazePredictor:
 
 
 if __name__ == "__main__":
-    GazePredictor("/home/khan/modelTesting/ModelModules/preProcessing/demoData.npz")
+    GazePredictor("/Users/khan/code/attently/modelTesting/demoData.npz")
